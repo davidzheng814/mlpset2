@@ -7,6 +7,9 @@ import pylab as pl
 # scoreFn is a function of a data point
 # values is a list of values to plot
 
+font = {'size':19}
+pl.rc('font', **font)
+
 def plotDecisionBoundary(X, Y, scoreFn, values, title = ""):
     # Plot the decision boundary. For that, we will asign a score to
     # each point in the mesh [x_min, m_max]x[y_min, y_max].
