@@ -19,12 +19,12 @@ def dot_product(x, y):
 def rbf_factory(sigma=1):
     return lambda x, y: math.exp(-LA.norm(x - y) ** 2 / (2 * sigma ** 2))
 
-cache_b = None
+# cache_b = None
 
 def get_svm_b(X, Y, alpha, k=dot_product):
-    global cache_b
-    if cache_b is not None:
-        return cache_b
+    # global cache_b
+    # if cache_b is not None:
+    #     return cache_b
     count = 0
     b = 0
     eps = 1e-8
@@ -36,11 +36,11 @@ def get_svm_b(X, Y, alpha, k=dot_product):
             b -= alpha_j * y2 * k(x, x2)
         b += y
     b /= count
-    cache_b = b
+    # cache_b = b
     return b
 
-def predict_svm(X, Y, alpha, val, k=dot_product):
-    b = get_svm_b(X, Y, alpha, k=k)
+def predict_svm(X, Y, alpha, val, b, k=dot_product):
+    # b = get_svm_b(X, Y, alpha, k=k)
     sum = 0
     for x, y, alpha_i in zip(X, Y, alpha):
         sum += alpha_i * y * k(x, val)
@@ -48,8 +48,9 @@ def predict_svm(X, Y, alpha, val, k=dot_product):
 
 def evaluate_svm(X_test, Y_test, X, Y, alpha, k=dot_product):
     correct = 0
+    b = get_svm_b(X, Y, alpha, k=k)
     for x, y in zip(X_test, Y_test):
-        predict_y = predict_svm(X, Y, alpha, x, k=k)
+        predict_y = predict_svm(X, Y, alpha, x, b, k=k)
         predict_y = 1 if predict_y > 0 else -1
         if predict_y == y:
             correct += 1
@@ -134,9 +135,9 @@ def train_logistic_regression(pos_train, neg_train, pos_val, neg_val, pos_test, 
             reg = logistic_regression(X_train, Y_train, penalty=penalty, lam=lam)
             val_error = 1 - reg.score(X_val, Y_val)
             # print "Coefficient:", reg.coef_, "Intercept:", reg.intercept_
-            print "Penalty", penalty
-            print "Lambda", lam
-            print "Validation Error:", val_error, "\n"
+            # print "Penalty", penalty
+            # print "Lambda", lam
+            # print "Validation Error:", val_error, "\n"
             if (val_error < best_val_error):
                 best_val_error = val_error
                 best_penalty = penalty
@@ -158,8 +159,8 @@ def train_linear_svm(pos_train, neg_train, pos_val, neg_val, pos_test, neg_test)
     for C in [1e-2, 1e-1, 1e0, 1e1, 1e2]:
         alpha = svm(X_train, Y_train, C=C)
         val_error = evaluate_svm(X_val, Y_val, X_train, Y_train, alpha)
-        print "C:", C
-        print "Validation Error:", val_error, "\n"
+        # print "C:", C
+        # print "Validation Error:", val_error, "\n"
         if (val_error < best_val_error):
             best_val_error = val_error
             best_alpha = alpha
@@ -177,14 +178,14 @@ def train_gaussian_svm(pos_train, neg_train, pos_val, neg_val, pos_test, neg_tes
     best_alpha = None
     best_C = None
     best_gamma = None
-    for C in [1e-2, 1e-1, 1e0, 1e1, 1e2]:
-        for gamma in [1e-2, 1e-1, 1e0, 1e1, 1e2]:
+    for gamma in [1e1, 1e2, 1e3, 1e4, 1e5]:
+        for C in [1e-2, 1e-1, 1e0, 1e1, 1e2]:
             k = rbf_factory(sigma=gamma)
             alpha = svm(X_train, Y_train, C=C, k=k)
             val_error = evaluate_svm(X_val, Y_val, X_train, Y_train, alpha, k=k)
-            print "C:", C
-            print "Gamma:", gamma
-            print "Validation Error:", val_error, "\n"
+            # print "C:", C
+            # print "Gamma:", gamma
+            # print "Validation Error:", val_error, "\n"
             if (val_error < best_val_error):
                 best_val_error = val_error
                 best_alpha = alpha
@@ -230,9 +231,9 @@ def train_gaussian_pegasos(pos_train, neg_train, pos_val, neg_val, pos_test, neg
             k = rbf_factory(sigma=gamma)
             alpha = pegasos_with_kernel(X_train, Y_train, make_gram_matrix(len(X_train), k, X_train), lam=lam)
             val_error = evaluate_pegasos(X_val, Y_val, X_train, Y_train, alpha, k=k)
-            print "Lambda:", lam
-            print "Gamma:", gamma
-            print "Validation Error:", val_error, "\n"
+            # print "Lambda:", lam
+            # print "Gamma:", gamma
+            # print "Validation Error:", val_error, "\n"
             if (val_error < best_val_error):
                 best_val_error = val_error
                 best_alpha = alpha

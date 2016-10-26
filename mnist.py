@@ -3,6 +3,10 @@ from plotBoundary import *
 import pylab as pl
 from optimizers import *
 import csv
+from pylab import imshow, show, cm
+ 
+imshow(digit.reshape(28,28),cmap=cm.gray)
+show()
 
 # train[digit] gives the training set of points for the given digit
 normalized_train = []
